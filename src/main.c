@@ -300,8 +300,10 @@ static void handle_keyboard_event(SDL_KeyboardEvent *event) {
 		case SDLK_F10:
 			if (SDL_GetWindowFlags(viewer.window) & SDL_WINDOW_FULLSCREEN) {
 				SDL_SetWindowFullscreen(viewer.window, 0);
+				adjust_zoom_level_to_fit_screen();
 			} else {
 				SDL_SetWindowFullscreen(viewer.window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+				adjust_zoom_level_to_fit_screen();
 			}
 			break;
 		case SDLK_q: {
@@ -349,6 +351,7 @@ static void handle_window_event(SDL_WindowEvent *event) {
 			break;
 		case SDL_WINDOWEVENT_RESTORED:
 		case SDL_WINDOWEVENT_SIZE_CHANGED:
+			adjust_zoom_level_to_fit_screen();
 			trigger_refresh();
 			break;
 	}
