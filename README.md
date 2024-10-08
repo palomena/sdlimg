@@ -1,6 +1,8 @@
 # sdlimg
 A simple [SDL2](http://libsdl.org/) image viewer.
 
+![Screenshot](Screenshot.png)
+
 ## Features
 * Drag and drop
 * Filtering (Best, Linear, Nearest)
