@@ -184,17 +184,33 @@ static void adjust_zoom_level_to_fit_screen(void) {
 	}
 }
 
+static void toggle_scale_mode(void) {
+	static const SDL_ScaleMode modes[] = {
+		SDL_ScaleModeBest,
+		SDL_ScaleModeLinear,
+		SDL_ScaleModeNearest
+	};
+	static int index = 0;
+	index = (index+1) % SDL_arraysize(modes);
+	SDL_SetTextureScaleMode(viewer.image, modes[index]);
+}
+
 static void open_image(const char *path) {
 	SDL_Log("Loading image file \"%s\"", path);
 	SDL_Surface *surface = IMG_Load(path);
 	if (surface != NULL) {
+		SDL_Surface *image = SDL_CreateRGBSurfaceWithFormat(0, surface->w, surface->h, 24, SDL_PIXELFORMAT_RGB888);
+		SDL_FillRect(image, NULL, SDL_MapRGB(image->format, 255, 255, 255)); // Fill with white
+		SDL_BlitSurface(surface, NULL, image, NULL);
 		close_image();
-		viewer.image = SDL_CreateTextureFromSurface(viewer.renderer, surface);
+		viewer.image = SDL_CreateTextureFromSurface(viewer.renderer, image);
 		viewer.path = path;
 		ensure_valid_pointer(viewer.image);
 		SDL_FreeSurface(surface);
+		SDL_FreeSurface(image);
 		SDL_SetWindowTitle(viewer.window, filename(path));
 		adjust_zoom_level_to_fit_screen();
+		toggle_scale_mode();
 	} else {
 		show_error(IMG_GetError());
 	}
@@ -331,17 +347,9 @@ static void handle_keyboard_event(SDL_KeyboardEvent *event) {
 			viewer.flip = flips[index];
 			break;
 		}
-		case SDLK_a: {
-			static const SDL_ScaleMode modes[] = {
-				SDL_ScaleModeBest,
-				SDL_ScaleModeLinear,
-				SDL_ScaleModeNearest
-			};
-			static int index = 0;
-			index = (index+1) % SDL_arraysize(modes);
-			SDL_SetTextureScaleMode(viewer.image, modes[index]);
+		case SDLK_a:
+			toggle_scale_mode();
 			break;
-		}
 	}
 }
 
